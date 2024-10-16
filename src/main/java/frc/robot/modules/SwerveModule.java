@@ -8,6 +8,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants.DriveConstants;
@@ -16,6 +17,9 @@ public class SwerveModule {
     private final TalonFX driveMotor;
     private final TalonFX steerMotor;
     private final CANcoder steerEncoder;
+    private final SimpleMotorFeedforward driveFeedForward;
+
+    private double lastVelocity = 0;
 
     public SwerveModule(int driveMotorId, int steerMotorId, int steerEncoderId) {
         driveMotor = new TalonFX(driveMotorId);
@@ -23,9 +27,6 @@ public class SwerveModule {
         steerEncoder = new CANcoder(steerEncoderId);
 
         steerEncoder.getConfigurator().apply(new CANcoderConfiguration());
-
-        driveMotor.getConfigurator().apply(new TalonFXConfiguration());
-
         // drive motor config
         TalonFXConfiguration driveConfig = new TalonFXConfiguration();
         driveConfig.Slot0.kP = DriveConstants.DRIVE_P;
@@ -49,13 +50,23 @@ public class SwerveModule {
         steerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         steerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         steerMotor.getConfigurator().apply(steerConfig);
+
+        driveFeedForward = new SimpleMotorFeedforward(DriveConstants.kS, DriveConstants.kV, DriveConstants.kA);
     }
 
     public void setDesiredState(SwerveModuleState desiredState) {
         SwerveModuleState state = SwerveModuleState.optimize(desiredState, getSteerAngle());
 
         double velocityRPS = state.speedMetersPerSecond / DriveConstants.WHEEL_CIRCUMFERENCE;
-        driveMotor.setControl(new VelocityVoltage(velocityRPS));
+
+        // acceleration
+        double acceleration = (velocityRPS - lastVelocity) / 0.02; // 20ms loop time
+        lastVelocity = velocityRPS;
+
+        // calc feedfrowrad
+        double feedforward = driveFeedForward.calculate(velocityRPS, acceleration);
+
+        driveMotor.setControl(new VelocityVoltage(velocityRPS).withFeedForward(feedforward));
 
         double steerPositionRotations = state.angle.getRotations();
         steerMotor.setControl(new PositionVoltage(steerPositionRotations));

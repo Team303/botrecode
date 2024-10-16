@@ -57,6 +57,11 @@ public final class Constants {
     public static final double DRIVE_CURRENT_LIMIT = 40;
     public static final int TURN_CURRENT_LIMIT = 20;
 
+    /* Feedforward */
+    public static final double kS = 0.1; // static friction compensation
+    public static final double kV = 0.8; // velocity proportional feedforward
+    public static final double kA = 0.1; // acceleration feedforward
+
   }
 
   public static class OperatorConstants {
