@@ -95,6 +95,15 @@ public class SwerveSubsystem extends SubsystemBase {
         rightBackModule.setDesiredState(desiredStates[3]);
     }
 
+    public void setXPattern() {
+        SwerveModuleState[] xStates = new SwerveModuleState[4];
+        xStates[0] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+        xStates[1] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
+        xStates[2] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
+        xStates[3] = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+        setModuleStates(xStates);
+    }
+
     private Rotation2d getRotation2d() {
         return navx.getRotation2d();
     }

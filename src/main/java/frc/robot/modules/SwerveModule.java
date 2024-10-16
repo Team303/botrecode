@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.ModuleConstants;
 
 public class SwerveModule {
     private final TalonFX driveMotor;
@@ -30,9 +31,12 @@ public class SwerveModule {
         steerEncoder.getConfigurator().apply(new CANcoderConfiguration());
         // drive motor config
         TalonFXConfiguration driveConfig = new TalonFXConfiguration();
-        driveConfig.Slot0.kP = DriveConstants.DRIVE_P;
-        driveConfig.Slot0.kI = DriveConstants.DRIVE_I;
-        driveConfig.Slot0.kD = DriveConstants.DRIVE_D;
+        driveConfig.Slot0.kP = ModuleConstants.DRIVE_P;
+        driveConfig.Slot0.kI = ModuleConstants.DRIVE_I;
+        driveConfig.Slot0.kD = ModuleConstants.DRIVE_D;
+        driveConfig.Slot0.kS = ModuleConstants.DRIVE_S;
+        driveConfig.Slot0.kV = ModuleConstants.DRIVE_V;
+        driveConfig.Slot0.kA = ModuleConstants.DRIVE_A;
         driveConfig.Voltage.PeakForwardVoltage = DriveConstants.MAX_VOLTAGE;
         driveConfig.Voltage.PeakReverseVoltage = -DriveConstants.MAX_VOLTAGE;
         driveConfig.CurrentLimits.SupplyCurrentLimit = DriveConstants.DRIVE_CURRENT_LIMIT;
@@ -42,9 +46,11 @@ public class SwerveModule {
 
         // steer motor config
         TalonFXConfiguration steerConfig = new TalonFXConfiguration();
-        steerConfig.Slot0.kP = DriveConstants.STEER_P;
-        steerConfig.Slot0.kI = DriveConstants.STEER_I;
-        steerConfig.Slot0.kD = DriveConstants.STEER_D;
+        steerConfig.Slot0.kP = ModuleConstants.STEER_P;
+        steerConfig.Slot0.kI = ModuleConstants.STEER_I;
+        steerConfig.Slot0.kD = ModuleConstants.STEER_D;
+        steerConfig.Slot0.kS = ModuleConstants.STEER_S;
+        steerConfig.Slot0.kV = ModuleConstants.STEER_V;
         steerConfig.Voltage.PeakForwardVoltage = DriveConstants.MAX_VOLTAGE;
         steerConfig.Voltage.PeakReverseVoltage = -DriveConstants.MAX_VOLTAGE;
         steerConfig.CurrentLimits.SupplyCurrentLimit = DriveConstants.TURN_CURRENT_LIMIT;
@@ -52,7 +58,8 @@ public class SwerveModule {
         steerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         steerMotor.getConfigurator().apply(steerConfig);
 
-        driveFeedForward = new SimpleMotorFeedforward(DriveConstants.kS, DriveConstants.kV, DriveConstants.kA);
+        driveFeedForward = new SimpleMotorFeedforward(ModuleConstants.DRIVE_S, ModuleConstants.DRIVE_V,
+                ModuleConstants.DRIVE_A);
     }
 
     public void setDesiredState(SwerveModuleState desiredState) {

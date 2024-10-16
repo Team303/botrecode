@@ -58,15 +58,27 @@ public final class Constants {
     public static final double DRIVE_CURRENT_LIMIT = 40;
     public static final int TURN_CURRENT_LIMIT = 20;
 
-    /* Feedforward */
-    public static final double kS = 0.1; // static friction compensation
-    public static final double kV = 0.8; // velocity proportional feedforward
-    public static final double kA = 0.1; // acceleration feedforward
-
     /* Odometry */
     public static final double DRIVE_ENCODER_DISTANCE_PER_PULSE = (DriveConstants.WHEEL_DIAMETER * Math.PI)
         / (DriveConstants.DRIVE_GEAR_RATIO * 2048.0);
 
+  }
+
+  public static final class ModuleConstants {
+    // Drive motor PID constants
+    public static final double DRIVE_P = 0.1;
+    public static final double DRIVE_I = 0.0;
+    public static final double DRIVE_D = 0.05;
+    public static final double DRIVE_S = 0.05; // Static friction compensation
+    public static final double DRIVE_V = 0.08; // Velocity feedforward
+    public static final double DRIVE_A = 0.01; // Acceleration feedforward
+
+    // Steer motor PID constants
+    public static final double STEER_P = 1.0;
+    public static final double STEER_I = 0.0;
+    public static final double STEER_D = 0.1;
+    public static final double STEER_S = 0.05; // Static friction compensation
+    public static final double STEER_V = 0.08; // Velocity feedforward
   }
 
   public static class OperatorConstants {

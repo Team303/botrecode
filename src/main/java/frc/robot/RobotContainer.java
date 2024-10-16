@@ -10,10 +10,13 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -27,12 +30,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-  private final SwerveSubsystem m_swerveDriveSubsystem = new SwerveSubsystem();
+  private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
+
+  private boolean m_isFieldRelative = true;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -41,7 +45,14 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
 
-    configureDefaultCommands();
+    m_swerveSubsystem.setDefaultCommand(
+        new RunCommand(
+            () -> m_swerveSubsystem.drive(
+                -m_driverController.getLeftY() * Constants.DriveConstants.MAX_SPEED_METERS_PER_SECOND,
+                -m_driverController.getLeftX() * Constants.DriveConstants.MAX_SPEED_METERS_PER_SECOND,
+                -m_driverController.getRightX() * Constants.DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+                m_isFieldRelative),
+            m_swerveSubsystem));
 
   }
 
@@ -60,25 +71,22 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(m_exampleSubsystem::exampleCondition)
-        .onTrue(new ExampleCommand(m_exampleSubsystem));
+    m_driverController.y().onTrue(new InstantCommand(m_swerveSubsystem::zeroHeading));
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is
-    // pressed,
-    // cancelling on release.
-    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-  }
+    m_driverController.x().onTrue(new InstantCommand(() -> m_isFieldRelative = !m_isFieldRelative));
 
-  private void configureDefaultCommands() {
-    m_swerveDriveSubsystem.setDefaultCommand(
+    m_driverController.b().whileTrue(new RunCommand(m_swerveSubsystem::setXPattern, m_swerveSubsystem));
+
+    m_driverController.start().onTrue(new InstantCommand(() -> m_swerveSubsystem.resetOdometry(new Pose2d())));
+
+    m_driverController.rightBumper().whileTrue(
         new RunCommand(
-            () -> m_swerveDriveSubsystem.drive(
-                -m_driverController.getLeftY() * DriveConstants.MAX_SPEED_METERS_PER_SECOND,
-                -m_driverController.getLeftX() * DriveConstants.MAX_SPEED_METERS_PER_SECOND,
-                -m_driverController.getRightX() * DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
-                true),
-            m_swerveDriveSubsystem));
+            () -> m_swerveSubsystem.drive(
+                -m_driverController.getLeftY() * Constants.DriveConstants.MAX_SPEED_METERS_PER_SECOND * 0.5,
+                -m_driverController.getLeftX() * Constants.DriveConstants.MAX_SPEED_METERS_PER_SECOND * 0.5,
+                -m_driverController.getRightX() * Constants.DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND * 0.5,
+                m_isFieldRelative),
+            m_swerveSubsystem));
   }
 
   /**
@@ -88,7 +96,8 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
+    // return Autos.exampleAuto(m_exampleSubsystem);
+    return null;
   }
 
   public CommandXboxController getDriverController() {
@@ -96,6 +105,6 @@ public class RobotContainer {
   }
 
   public SwerveSubsystem getSwerveDriveSubsystem() {
-    return m_swerveDriveSubsystem;
+    return m_swerveSubsystem;
   }
 }

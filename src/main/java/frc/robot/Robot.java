@@ -23,9 +23,9 @@ import frc.robot.subsystems.SwerveSubsystem;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-  private MotorSubsystem m_MotorSubsystem;
-  private MotorCommand m_MotorCommand;
-  private SwerveSubsystem m_swerveDrive;
+  // private MotorSubsystem m_MotorSubsystem;
+  // private MotorCommand m_MotorCommand;
+  // private SwerveSubsystem m_swerveDrive;
 
   private RobotContainer m_robotContainer;
 
@@ -42,14 +42,14 @@ public class Robot extends TimedRobot {
     // m_robotContainer = new RobotContainer();
 
     m_robotContainer = new RobotContainer();
-    m_swerveDrive = m_robotContainer.getSwerveDriveSubsystem();
+    // m_swerveDrive = m_robotContainer.getSwerveDriveSubsystem();
 
-    m_MotorSubsystem = new MotorSubsystem();
-    m_MotorCommand = new MotorCommand(m_MotorSubsystem);
+    // m_MotorSubsystem = new MotorSubsystem();
+    // m_MotorCommand = new MotorCommand(m_MotorSubsystem);
 
-    CommandScheduler.getInstance().schedule(m_MotorCommand);
+    // CommandScheduler.getInstance().schedule(m_MotorCommand);
 
-    m_swerveDrive.zeroHeading();
+    // m_swerveDrive.zeroHeading();
   }
 
   /**
@@ -116,12 +116,17 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    double xSpeed = -m_robotContainer.getDriverController().getLeftY() * DriveConstants.MAX_SPEED_METERS_PER_SECOND;
-    double ySpeed = -m_robotContainer.getDriverController().getLeftX() * DriveConstants.MAX_SPEED_METERS_PER_SECOND;
-    double rotation = -m_robotContainer.getDriverController().getRightX()
-        * DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+    // double xSpeed = -m_robotContainer.getDriverController().getLeftY() *
+    // DriveConstants.MAX_SPEED_METERS_PER_SECOND;
+    // double ySpeed = -m_robotContainer.getDriverController().getLeftX() *
+    // DriveConstants.MAX_SPEED_METERS_PER_SECOND;
+    // double rotation = -m_robotContainer.getDriverController().getRightX()
+    // * DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
 
-    m_swerveDrive.drive(xSpeed, ySpeed, rotation, true);
+    // m_swerveDrive.drive(xSpeed, ySpeed, rotation, true);
+    if (m_autonomousCommand != null) {
+      m_autonomousCommand.cancel();
+    }
   }
 
   @Override
