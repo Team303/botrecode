@@ -40,6 +40,7 @@ public final class Constants {
     public static final double TRACKWIDTH = 0.5;
     public static final double WHEEL_DIAMETER = 0.10033;
     public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
+    public static final double DRIVE_GEAR_RATIO = 0.5;
 
     public static final double MAX_SPEED_METERS_PER_SECOND = 4.5;
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI;
@@ -61,6 +62,10 @@ public final class Constants {
     public static final double kS = 0.1; // static friction compensation
     public static final double kV = 0.8; // velocity proportional feedforward
     public static final double kA = 0.1; // acceleration feedforward
+
+    /* Odometry */
+    public static final double DRIVE_ENCODER_DISTANCE_PER_PULSE = (DriveConstants.WHEEL_DIAMETER * Math.PI)
+        / (DriveConstants.DRIVE_GEAR_RATIO * 2048.0);
 
   }
 
