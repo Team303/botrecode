@@ -52,6 +52,11 @@ public final class Constants {
     public static final double STEER_I = 0.0;
     public static final double STEER_D = 0.1;
 
+    /* Current limits */
+    public static final double MAX_VOLTAGE = 12.0;
+    public static final double DRIVE_CURRENT_LIMIT = 40;
+    public static final int TURN_CURRENT_LIMIT = 20;
+
   }
 
   public static class OperatorConstants {

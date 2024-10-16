@@ -6,6 +6,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -30,6 +31,11 @@ public class SwerveModule {
         driveConfig.Slot0.kP = DriveConstants.DRIVE_P;
         driveConfig.Slot0.kI = DriveConstants.DRIVE_I;
         driveConfig.Slot0.kD = DriveConstants.DRIVE_D;
+        driveConfig.Voltage.PeakForwardVoltage = DriveConstants.MAX_VOLTAGE;
+        driveConfig.Voltage.PeakReverseVoltage = -DriveConstants.MAX_VOLTAGE;
+        driveConfig.CurrentLimits.SupplyCurrentLimit = DriveConstants.DRIVE_CURRENT_LIMIT;
+        driveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         driveMotor.getConfigurator().apply(driveConfig);
 
         // steer motor config
@@ -37,6 +43,11 @@ public class SwerveModule {
         steerConfig.Slot0.kP = DriveConstants.STEER_P;
         steerConfig.Slot0.kI = DriveConstants.STEER_I;
         steerConfig.Slot0.kD = DriveConstants.STEER_D;
+        steerConfig.Voltage.PeakForwardVoltage = DriveConstants.MAX_VOLTAGE;
+        steerConfig.Voltage.PeakReverseVoltage = -DriveConstants.MAX_VOLTAGE;
+        steerConfig.CurrentLimits.SupplyCurrentLimit = DriveConstants.TURN_CURRENT_LIMIT;
+        steerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        steerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         steerMotor.getConfigurator().apply(steerConfig);
     }
 
