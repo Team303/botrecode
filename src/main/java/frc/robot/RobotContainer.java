@@ -13,6 +13,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -71,16 +72,17 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    m_driverController.y().onTrue(new InstantCommand(m_swerveSubsystem::zeroHeading));
+    m_driverController.y().onTrue(Commands.runOnce(m_swerveSubsystem::zeroHeading, m_swerveSubsystem));
 
-    m_driverController.x().onTrue(new InstantCommand(() -> m_isFieldRelative = !m_isFieldRelative));
+    m_driverController.x().onTrue(Commands.runOnce(() -> m_isFieldRelative = !m_isFieldRelative));
 
-    m_driverController.b().whileTrue(new RunCommand(m_swerveSubsystem::setXPattern, m_swerveSubsystem));
+    m_driverController.b().whileTrue(Commands.run(m_swerveSubsystem::setXPattern, m_swerveSubsystem));
 
-    m_driverController.start().onTrue(new InstantCommand(() -> m_swerveSubsystem.resetOdometry(new Pose2d())));
+    m_driverController.start()
+        .onTrue(Commands.runOnce(() -> m_swerveSubsystem.resetOdometry(new Pose2d()), m_swerveSubsystem));
 
     m_driverController.rightBumper().whileTrue(
-        new RunCommand(
+        Commands.run(
             () -> m_swerveSubsystem.drive(
                 -m_driverController.getLeftY() * Constants.DriveConstants.MAX_SPEED_METERS_PER_SECOND * 0.5,
                 -m_driverController.getLeftX() * Constants.DriveConstants.MAX_SPEED_METERS_PER_SECOND * 0.5,
