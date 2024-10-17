@@ -7,6 +7,10 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,15 +21,17 @@ import frc.robot.Constants.ModuleConstants;
 
 public class SwerveModule {
     private final TalonFX driveMotor;
-    private final TalonFX steerMotor;
+    private final CANSparkMax steerMotor;
     private final CANcoder steerEncoder;
     private final SimpleMotorFeedforward driveFeedForward;
+    private final SparkMaxPIDController steerPIDController;
+    private final RelativeEncoder steerRelativeEncoder;
 
     private double lastVelocity = 0;
 
     public SwerveModule(int driveMotorId, int steerMotorId, int steerEncoderId) {
         driveMotor = new TalonFX(driveMotorId);
-        steerMotor = new TalonFX(steerMotorId);
+        steerMotor = new CANSparkMax(steerMotorId, MotorType.kBrushless);
         steerEncoder = new CANcoder(steerEncoderId);
 
         steerEncoder.getConfigurator().apply(new CANcoderConfiguration());
@@ -45,21 +51,23 @@ public class SwerveModule {
         driveMotor.getConfigurator().apply(driveConfig);
 
         // steer motor config
-        TalonFXConfiguration steerConfig = new TalonFXConfiguration();
-        steerConfig.Slot0.kP = ModuleConstants.STEER_P;
-        steerConfig.Slot0.kI = ModuleConstants.STEER_I;
-        steerConfig.Slot0.kD = ModuleConstants.STEER_D;
-        steerConfig.Slot0.kS = ModuleConstants.STEER_S;
-        steerConfig.Slot0.kV = ModuleConstants.STEER_V;
-        steerConfig.Voltage.PeakForwardVoltage = DriveConstants.MAX_VOLTAGE;
-        steerConfig.Voltage.PeakReverseVoltage = -DriveConstants.MAX_VOLTAGE;
-        steerConfig.CurrentLimits.SupplyCurrentLimit = DriveConstants.TURN_CURRENT_LIMIT;
-        steerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        steerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        steerMotor.getConfigurator().apply(steerConfig);
+        steerMotor.restoreFactoryDefaults();
+        steerMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        steerMotor.setSmartCurrentLimit((int) DriveConstants.TURN_CURRENT_LIMIT);
+        steerPIDController = steerMotor.getPIDController();
+        steerRelativeEncoder = steerMotor.getEncoder();
+
+        steerPIDController.setP(ModuleConstants.STEER_P);
+        steerPIDController.setI(ModuleConstants.STEER_I);
+        steerPIDController.setD(ModuleConstants.STEER_D);
+        steerPIDController.setFF(ModuleConstants.STEER_V);
+        steerPIDController.setOutputRange(-1, 1);
 
         driveFeedForward = new SimpleMotorFeedforward(ModuleConstants.DRIVE_S, ModuleConstants.DRIVE_V,
                 ModuleConstants.DRIVE_A);
+
+        steerMotor.burnFlash();
+
     }
 
     public void setDesiredState(SwerveModuleState desiredState) {
@@ -77,7 +85,7 @@ public class SwerveModule {
         driveMotor.setControl(new VelocityVoltage(velocityRPS).withFeedForward(feedforward));
 
         double steerPositionRotations = state.angle.getRotations();
-        steerMotor.setControl(new PositionVoltage(steerPositionRotations));
+        steerPIDController.setReference(steerPositionRotations, CANSparkMax.ControlType.kPosition);
     }
 
     private Rotation2d getSteerAngle() {

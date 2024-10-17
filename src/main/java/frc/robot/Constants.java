@@ -81,6 +81,33 @@ public final class Constants {
     public static final double STEER_V = 0.08; // Velocity feedforward
   }
 
+  public static final class BeltConstants {
+    /* CAN IDs */
+    public static final int BELT_MOTOR_ID = 14;
+    public static final int INDEXER_MOTOR_ID = 15;
+
+    /* DIO Port */
+    public static final int BEAM_BREAK_SENSOR_PORT = 0;
+
+    /* Motor Speeds */
+    public static final double BELT_INTAKE_SPEED = 0.5;
+    public static final double BELT_EJECT_SPEED = -0.5;
+    public static final double INDEXER_SPEED = 0.3;
+
+    /* Current Limits */
+    public static final int BELT_CURRENT_LIMIT = 40;
+    public static final int INDEXER_CURRENT_LIMIT = 40;
+
+    /* PID Constants (if needed) */
+    public static final double BELT_P = 0.1;
+    public static final double BELT_I = 0.0;
+    public static final double BELT_D = 0.0;
+
+    public static final double INDEXER_P = 0.1;
+    public static final double INDEXER_I = 0.0;
+    public static final double INDEXER_D = 0.0;
+  }
+
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
