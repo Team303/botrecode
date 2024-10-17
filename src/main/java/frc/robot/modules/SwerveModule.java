@@ -88,8 +88,12 @@ public class SwerveModule {
         steerPIDController.setReference(steerPositionRotations, CANSparkMax.ControlType.kPosition);
     }
 
-    private Rotation2d getSteerAngle() {
+    public Rotation2d getSteerAngle() {
         return Rotation2d.fromRotations(steerEncoder.getAbsolutePosition().getValue());
+    }
+
+    public double getDriveVelocity() {
+        return driveMotor.getVelocity().getValue() * DriveConstants.DRIVE_ENCODER_DISTANCE_PER_PULSE;
     }
 
     public SwerveModulePosition getPosition() {
